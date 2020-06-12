@@ -4,21 +4,21 @@
 
 # Optionally glob, but only for CMake 3.12 or later:
 # file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${ModernCMakeExample_SOURCE_DIR}/include/modern/*.hpp")
-set(HEADER_LIST "${cpp-template_SOURCE_DIR}/include/some_header.h")
+set(HEADER_LIST "${PROJECT_SOURCE_DIR}/include/list.hpp")
 
 # find_package(PACKAGE_NAME REQUIRED)
 # include_directories(${SOME_INCLUDE_DIR})
 
 # Add all the src cpp files with the headers
-add_executable(EXE_NAME main.cpp ${HEADER_LIST})
-# gcc -lPACKAGE_NAME
-target_link_libraries(EXE_NAME PACKAGE_NAME)
+add_executable(LinkedList.o main.cpp ${HEADER_LIST})
+
+target_link_libraries(LinkedList.o)
 
 # Ensure everything in `include` is included.
-target_include_directories(EXE_NAME PUBLIC ../include)
+target_include_directories(LinkedList.o PUBLIC ../include)
 
 # C++11
-target_compile_features(EXE_NAME PUBLIC cxx_std_11)
+target_compile_features(LinkedList.o PUBLIC cxx_std_11)
 
 # IDEs should put the headers in a nice place
 source_group(TREE "${PROJECT_SOURCE_DIR}/include" PREFIX "Header Files" FILES ${HEADER_LIST})

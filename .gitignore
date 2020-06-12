@@ -34,3 +34,6 @@ settings.json
 *.exe
 *.out
 *.app
+
+# Cmake
+build/
