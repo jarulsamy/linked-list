@@ -1,126 +1,121 @@
-#pragma once
-#include <iostream>
-#include <string.h>
+#ifndef LIST_HPP
+#define LIST_HPP
 
-using std::cout;
-using std::endl;
+#include <deque>
 
 template <class T>
 class Node
 {
 public:
-    T data;
-    Node<T> *next;
-    Node<T> *prev;
-
-    Node()
+    Node(T data) : value(data)
     {
         next = nullptr;
         prev = nullptr;
     }
-    Node(T d)
+    Node(T data, Node<T> *pr) : value(data), prev(pr)
     {
-        Node();
-        data = d;
-    };
+        next = nullptr;
+    }
+
+    T value;
+    Node<T> *next;
+    Node<T> *prev;
 };
 
 template <class T>
 class LinkedList
 {
 public:
-    Node<T> *head;
-    Node<T> *tail;
-    int length;
-
     LinkedList()
     {
-        head = nullptr;
         tail = nullptr;
-        length = 0;
+        head = nullptr;
+        my_size = 0;
+    }
+    LinkedList(T data)
+    {
+        tail = new Node<T>(data);
+        head = tail;
+        my_size = 1;
     }
 
     ~LinkedList()
     {
-        empty();
+        destroy(tail);
     }
 
-    void empty() /* Delete all elements */
+    void push_back(T val)
     {
-        if (length > 0)
+        if (!tail)
         {
-            Node<T> *my_head = head;
-            Node<T> *to_del;
-            while (my_head)
-            {
-                to_del = my_head;
-                my_head = my_head->prev;
-                delete to_del;
-            }
-        }
-    }
-
-    void insert(T data) /* Add item to list */
-    {
-        if (!head)
-        {
-            head = new Node<T>(data);
-            tail = head;
+            // Create tail if it doesn't exist
+            tail = new Node<T>(val);
+            head = tail;
         }
         else
         {
-            Node<T> *old_head = head;
-
-            head = new Node<T>(data);
-            old_head->next = head;
-            head->prev = old_head;
+            push_back(val, head->next, head);
         }
-        length++;
     }
 
-    bool find(T data) /* Find an item in list */
+    void pop_back()
+    {
+    }
+
+    size_t size() const
+    {
+        return my_size;
+    }
+
+    void dump(std::deque<T> &container) const
     {
         Node<T> *my_head = tail;
+
         while (my_head)
         {
-            if (my_head->data == data)
-                return true;
-
+            container.push_back(my_head->value);
             my_head = my_head->next;
         }
-        return false;
     }
 
-    void print() /* Print entire list to stdout */
+    void dump_reverse(std::deque<T> &container) const
     {
-        Node<T> *my_head = tail;
+        Node<T> *my_head = head;
 
-        if (length > 0)
+        while (my_head)
         {
-            while (my_head)
-            {
-                cout << my_head->data << endl;
-                my_head = my_head->next;
-            }
+            container.push_back(my_head->value);
+            my_head = my_head->prev;
+        }
+    }
+
+private:
+    Node<T> *tail;
+    Node<T> *head;
+    size_t my_size;
+
+    void push_back(T val, Node<T> *&node, Node<T> *&prev_node)
+    {
+        if (!node)
+        {
+            node = new Node<T>(val, prev_node);
+            head = node;
+            ++my_size;
+        }
+        else
+        {
+            push_back(val, node->next, node);
+        }
+    }
+
+    void destroy(Node<T> *&node)
+    {
+        if (node)
+        {
+            destroy(node->next);
+            delete node;
         }
     }
 };
 
-template <>
-bool LinkedList<std::string>::find(std::string data)
-{
-    int data_length = data.length();
-
-    Node<std::string> *my_head = tail;
-    while (my_head)
-    {
-        if (my_head->data.length() == data_length)
-        {
-            if (!strcmp(my_head->data.c_str(), data.c_str()))
-                return true;
-        }
-
-        my_head = my_head->next;
-    }
-    return false;
-}
+#endif
