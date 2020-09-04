@@ -3,6 +3,11 @@
 
 #include <deque>
 
+/**
+ * @brief A member of a linked list.
+ *
+ * @tparam T Some data to hold.
+ */
 template <class T>
 class Node
 {
@@ -22,16 +27,32 @@ public:
     Node<T> *prev;
 };
 
+/**
+ * @brief A doubly linked list
+ *
+ * @tparam T Optional first value to set as tail
+ * If not set, a tail is created with the first push_back.
+ */
 template <class T>
 class LinkedList
 {
 public:
+    /**
+    * @brief Construct a new Linked List object
+    *
+    */
     LinkedList()
     {
         tail = nullptr;
         head = nullptr;
         my_size = 0;
     }
+    /**
+     * @brief Construct a new Linked List object
+     *
+     * @param data Optionally first value to set as tail
+     * If not set, a tail is created with the first push_back.
+     */
     LinkedList(T data)
     {
         tail = new Node<T>(data);
@@ -39,11 +60,20 @@ public:
         my_size = 1;
     }
 
+    /**
+     * @brief Destroy the Linked List object
+     *
+     */
     ~LinkedList()
     {
         destroy(tail);
     }
 
+    /**
+     * @brief Add a value to the end of the list.
+     *
+     * @param val
+     */
     void push_back(T val)
     {
         if (!tail)
@@ -58,15 +88,30 @@ public:
         }
     }
 
+    /**
+     * @brief
+     *
+     * @todo impletement this
+     */
     void pop_back()
     {
     }
 
+    /**
+     * @brief Get the total number of elements in the list
+     *
+     * @return size_t
+     */
     size_t size() const
     {
         return my_size;
     }
 
+    /**
+     * @brief Dump the list into a deque
+     *
+     * @param container
+     */
     void dump(std::deque<T> &container) const
     {
         Node<T> *my_head = tail;
@@ -78,6 +123,11 @@ public:
         }
     }
 
+    /**
+     * @brief Dump the the list in reverse order into a deque
+     *
+     * @param container
+     */
     void dump_reverse(std::deque<T> &container) const
     {
         Node<T> *my_head = head;
@@ -94,6 +144,16 @@ private:
     Node<T> *head;
     size_t my_size;
 
+    /**
+     * @brief Recursively add a node to list
+     *
+     * @short This is recursive, to ensure the element is always added to end
+     * and that the head and tail are on opposing ends.
+     *
+     * @param val Data to add
+     * @param node Current node to add to
+     * @param prev_node Prev node to connect to
+     */
     void push_back(T val, Node<T> *&node, Node<T> *&prev_node)
     {
         if (!node)
@@ -108,6 +168,11 @@ private:
         }
     }
 
+    /**
+     * @brief Destroy a node and all subsequent nodes.
+     *
+     * @param node
+     */
     void destroy(Node<T> *&node)
     {
         if (node)
