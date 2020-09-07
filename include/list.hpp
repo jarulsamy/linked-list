@@ -89,12 +89,18 @@ public:
     }
 
     /**
-     * @brief
+     * @brief Remove an element from the list
      *
-     * @todo impletement this
      */
     void pop_back()
     {
+        if (head)
+        {
+            Node<T> to_del = head;
+            head = head->prev;
+            head->next = nullptr;
+            delete to_del;
+        }
     }
 
     /**
