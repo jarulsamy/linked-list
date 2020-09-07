@@ -1,126 +1,192 @@
-#pragma once
-#include <iostream>
-#include <string.h>
+#ifndef LIST_HPP
+#define LIST_HPP
 
-using std::cout;
-using std::endl;
+#include <deque>
 
+/**
+ * @brief A member of a linked list.
+ *
+ * @tparam T Some data to hold.
+ */
 template <class T>
 class Node
 {
 public:
-    T data;
-    Node<T> *next;
-    Node<T> *prev;
-
-    Node()
+    Node(T data) : value(data)
     {
         next = nullptr;
         prev = nullptr;
     }
-    Node(T d)
+    Node(T data, Node<T> *pr) : value(data), prev(pr)
     {
-        Node();
-        data = d;
-    };
+        next = nullptr;
+    }
+
+    T value;
+    Node<T> *next;
+    Node<T> *prev;
 };
 
+/**
+ * @brief A doubly linked list
+ *
+ * @tparam T Optional first value to set as tail
+ * If not set, a tail is created with the first push_back.
+ */
 template <class T>
 class LinkedList
 {
 public:
-    Node<T> *head;
-    Node<T> *tail;
-    int length;
-
+    /**
+    * @brief Construct a new Linked List object
+    *
+    */
     LinkedList()
     {
-        head = nullptr;
         tail = nullptr;
-        length = 0;
+        head = nullptr;
+        my_size = 0;
+    }
+    /**
+     * @brief Construct a new Linked List object
+     *
+     * @param data Optionally first value to set as tail
+     * If not set, a tail is created with the first push_back.
+     */
+    LinkedList(T data)
+    {
+        tail = new Node<T>(data);
+        head = tail;
+        my_size = 1;
     }
 
+    /**
+     * @brief Destroy the Linked List object
+     *
+     */
     ~LinkedList()
     {
-        empty();
+        destroy(tail);
     }
 
-    void empty() /* Delete all elements */
+    /**
+     * @brief Add a value to the end of the list.
+     *
+     * @param val
+     */
+    void push_back(T val)
     {
-        if (length > 0)
+        if (!tail)
         {
-            Node<T> *my_head = head;
-            Node<T> *to_del;
-            while (my_head)
-            {
-                to_del = my_head;
-                my_head = my_head->prev;
-                delete to_del;
-            }
-        }
-    }
-
-    void insert(T data) /* Add item to list */
-    {
-        if (!head)
-        {
-            head = new Node<T>(data);
-            tail = head;
+            // Create tail if it doesn't exist
+            tail = new Node<T>(val);
+            head = tail;
         }
         else
         {
-            Node<T> *old_head = head;
-
-            head = new Node<T>(data);
-            old_head->next = head;
-            head->prev = old_head;
+            push_back(val, head->next, head);
         }
-        length++;
     }
 
-    bool find(T data) /* Find an item in list */
+    /**
+     * @brief Remove an element from the list
+     *
+     */
+    void pop_back()
+    {
+        if (head)
+        {
+            Node<T> to_del = head;
+            head = head->prev;
+            head->next = nullptr;
+            delete to_del;
+        }
+    }
+
+    /**
+     * @brief Get the total number of elements in the list
+     *
+     * @return size_t
+     */
+    size_t size() const
+    {
+        return my_size;
+    }
+
+    /**
+     * @brief Dump the list into a deque
+     *
+     * @param container
+     */
+    void dump(std::deque<T> &container) const
     {
         Node<T> *my_head = tail;
+
         while (my_head)
         {
-            if (my_head->data == data)
-                return true;
-
+            container.push_back(my_head->value);
             my_head = my_head->next;
         }
-        return false;
     }
 
-    void print() /* Print entire list to stdout */
+    /**
+     * @brief Dump the the list in reverse order into a deque
+     *
+     * @param container
+     */
+    void dump_reverse(std::deque<T> &container) const
     {
-        Node<T> *my_head = tail;
+        Node<T> *my_head = head;
 
-        if (length > 0)
+        while (my_head)
         {
-            while (my_head)
-            {
-                cout << my_head->data << endl;
-                my_head = my_head->next;
-            }
+            container.push_back(my_head->value);
+            my_head = my_head->prev;
+        }
+    }
+
+private:
+    Node<T> *tail;
+    Node<T> *head;
+    size_t my_size;
+
+    /**
+     * @brief Recursively add a node to list
+     *
+     * @short This is recursive, to ensure the element is always added to end
+     * and that the head and tail are on opposing ends.
+     *
+     * @param val Data to add
+     * @param node Current node to add to
+     * @param prev_node Prev node to connect to
+     */
+    void push_back(T val, Node<T> *&node, Node<T> *&prev_node)
+    {
+        if (!node)
+        {
+            node = new Node<T>(val, prev_node);
+            head = node;
+            ++my_size;
+        }
+        else
+        {
+            push_back(val, node->next, node);
+        }
+    }
+
+    /**
+     * @brief Destroy a node and all subsequent nodes.
+     *
+     * @param node
+     */
+    void destroy(Node<T> *&node)
+    {
+        if (node)
+        {
+            destroy(node->next);
+            delete node;
         }
     }
 };
 
-template <>
-bool LinkedList<std::string>::find(std::string data)
-{
-    int data_length = data.length();
-
-    Node<std::string> *my_head = tail;
-    while (my_head)
-    {
-        if (my_head->data.length() == data_length)
-        {
-            if (!strcmp(my_head->data.c_str(), data.c_str()))
-                return true;
-        }
-
-        my_head = my_head->next;
-    }
-    return false;
-}
+#endif

@@ -1,19 +1,24 @@
-#pragma one
+#ifndef LOADER_HPP
+#define LOADER_HPP
 
 #include "list.hpp"
-#include <string>
 #include <fstream>
 
-LinkedList<std::string> load(std::string filename)
+LinkedList<int> load(std::string filename)
 {
-    LinkedList<std::string> ll;
-    std::ifstream word_file(filename);
-    std::string buffer;
+    LinkedList<int> ll;
 
+    std::ifstream word_file(filename);
+    if (!word_file.good())
+        throw std::runtime_error("Error reading from file");
+
+    int buffer;
     while (word_file >> buffer)
     {
-        ll.insert(buffer);
+        ll.push_back(buffer);
     }
 
     return ll;
 }
+
+#endif
